@@ -73,7 +73,8 @@ function createTrainerCards(trainer){
     
     let addPokemonToTrainerButton = document.createElement('button');
     addPokemonToTrainerButton.innerText = 'Add Pokemon';
-    
+    //add event listener
+    addPokemonToTrainerButton.addEventListener('click', e => addPokeman(e.target.parentNode))
     newTrainerCard.setAttribute('data-trainer-id',`${trainer.id}`);
     newTrainerPTag.innerText = trainer.name;
     newTrainerCard.appendChild(newTrainerPTag);
@@ -81,6 +82,7 @@ function createTrainerCards(trainer){
     newTrainerCard.appendChild(addPokemonToTrainerButton);
     mainContainter.appendChild(newTrainerCard);
     let newPokemonList = document.createElement('ul');
+    newPokemonList.className = 'pokeman-list'
     newTrainerCard.appendChild(newPokemonList);
     for (let pokemon of trainer.pokemons){
         console.log('test');
@@ -94,11 +96,53 @@ function buildPokemonListItem(pokemon){
     let newPokemonButton = document.createElement('button');
     newPokemonButton.className = 'release';
     newPokemonButton.innerText = 'Release';
+    newPokemonButton.addEventListener('click', (e) => killPokeman(e.target) )
     newPokemonListItem.innerText = pokemon.nickname;
     newPokemonButton.setAttribute('data-pokemon-id',`${pokemon.id}`)
     newPokemonListItem.appendChild(newPokemonButton);
     return newPokemonListItem
 };
+
+
+function addPokeman(trainerCard){
+    let trainerId = trainerCard.dataset.trainerId;
+    let pokeList = trainerCard.getElementsByClassName('pokeman-list')[0]
+
+    if (pokeList.childNodes.length <6){
+        fetch(POKEMONS_URL,{
+            method: 'POST',
+            header: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({trainer_id: trainerId})
+
+        })
+        .then(resp => console.log(resp.json()))
+        .then(console.log('pikachu'))
+        .catch(error => alert(error.message))
+    }
+    else{
+        alert("You cannot have more than 6 pokemen. Please kill omne to add another.")
+    }
+}
+
+function killPokeman(button){
+    let pokeId = button.dataset.pokemonId;
+    button.parentNode.remove();
+    fetch(`${BASE_URL}/pokemons/${pokeId}`, {
+        method: "DELETE",
+        header: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: pokeId})
+    })
+    .then(resp => console.log(resp.json()))
+
+    .then(console.log('rip'))
+    .catch(error => alert(error.message))
+}
 
 
 
