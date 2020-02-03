@@ -97,7 +97,8 @@ function buildPokemonListItem(pokemon){
     newPokemonButton.className = 'release';
     newPokemonButton.innerText = 'Release';
     newPokemonButton.addEventListener('click', (e) => killPokeman(e.target) )
-    newPokemonListItem.innerText = pokemon.nickname;
+    newPokemonListItem.innerText = pokemon.species;
+    newPokemonListItem.append(':  ' + pokemon.nickname);
     newPokemonButton.setAttribute('data-pokemon-id',`${pokemon.id}`)
     newPokemonListItem.appendChild(newPokemonButton);
     return newPokemonListItem
@@ -109,7 +110,7 @@ function addPokeman(trainerCard){
     let pokeList = trainerCard.getElementsByClassName('pokeman-list')[0]
 
     if (pokeList.childNodes.length <6){
-        fetch(POKEMONS_URL,{
+        fetch(`http://localhost:3000/trainers/${trainerId}/add`,{
             method: 'POST',
             header: {
                 'Accept': 'application/json',
@@ -118,12 +119,12 @@ function addPokeman(trainerCard){
             body: JSON.stringify({trainer_id: trainerId})
 
         })
-        .then(resp => console.log(resp.json()))
-        .then(console.log('pikachu'))
+        .then(resp => resp.json())
+        .then(json => pokeList.appendChild(buildPokemonListItem(json)))
         .catch(error => alert(error.message))
     }
     else{
-        alert("You cannot have more than 6 pokemen. Please kill omne to add another.")
+        alert("You cannot have more than 6 pokemen. Please kill one to add another.")
     }
 }
 
